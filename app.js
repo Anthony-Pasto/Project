@@ -2,21 +2,11 @@ const express = require('express');
 const app = express();
 
 const PORT = 3000;
-
+var status = [false, false, false, false, false, false];
 app.set('view engine', 'ejs');
 // Page d'accueil
 app.get('/', (req, res) => {
-    res.send(`
-        <h1>Bienvenue sur mon site</h1>
-
-        <p><a href="/contact">Contact</a></p>
-        <p><a href="/module/1">Module 1</a></p>
-        <p><a href="/module/2">Module 2</a></p>
-        <p><a href="/module/3">Module 3</a></p>
-        <p><a href="/module/4">Module 4</a></p>
-        <p><a href="/module/5">Module 5</a></p>
-        <p><a href="/module/6">Module 6</a></p>
-    `);
+   res.render('index' )
 });
 
 
@@ -53,13 +43,33 @@ app.get('/contact', (req, res) => {
 app.get('/module/:numero', (req, res) => {
 
     const numero = parseInt(req.params.numero);
-  
-    res.render('module', { nombre: numero });
+
+    if (numero >= 1 && numero <= 6) {
+    status[numero - 1] = !status[numero - 1];
+    }
+
+    res.render('module', { nombre: numero, donner: status[numero - 1] });
   
   
 });
+app.get('/reset', (req, res) => {
+    for (let i = 0; i < status.length; i++) {
+        status[i] = false;
+    }
+    res.send(`
+        Statut réinitialisé.
+        <a href="/">Retour à l'accueil</a>
+        `);
+});
+app.get('/controle', (req, res) => {
+    
+    res.send(`
+       statut actuel : ${status}
+        
 
-
+        <a href="/">Retour à l'accueil</a>
+        `);
+});
 // Page 404
 app.use((req, res) => {
     res.status(404).send(`
