@@ -3,7 +3,7 @@ const app = express();
 
 const PORT = 3000;
 
-
+app.set('view engine', 'ejs');
 // Page d'accueil
 app.get('/', (req, res) => {
     res.send(`
@@ -53,21 +53,10 @@ app.get('/contact', (req, res) => {
 app.get('/module/:numero', (req, res) => {
 
     const numero = parseInt(req.params.numero);
-
-    if (numero >= 1 && numero <= 6) {
-        res.send(`
-            <h1>Module ${numero}</h1>
-            <p>Vous êtes dans le module ${numero}.</p>
-
-            <a href="/">Retour à l'accueil</a>
-        `);
-    } else {
-        res.send(`
-            <h1>MODULE INCONNU</h1>
-
-            <a href="/">Retour à l'accueil</a>
-        `);
-    }
+  
+    res.render('module', { nombre: numero });
+  
+  
 });
 
 
