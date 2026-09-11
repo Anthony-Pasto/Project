@@ -1,9 +1,18 @@
+/*
+    Auteur: Anthony Pasto
+    Date: 2026/09/11
+    Titre: Serveur de contrôle des modules
+    Description: Ce fichier configure un serveur Express qui affiche la page
+    d'accueil, la page de contact et l'état de six modules. Il permet aussi
+    d'activer, de désactiver, de contrôler et de réinitialiser les modules.
+*/
 const express = require('express');
 const app = express();
 
 const PORT = 3000;
 var status = [false, false, false, false, false, false];
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
 // Page d'accueil
 app.get('/', (req, res) => {
    res.render('index' )
@@ -40,17 +49,38 @@ app.get('/contact', (req, res) => {
 
 
 // Route module
+app.post('/module/:numero', (req, res) => {
+
+    const numero = parseInt(req.params.numero);
+
+    if (numero >= 1 && numero <= 6) {
+
+        status[numero - 1] = req.body.etat === "on";
+
+
+    }
+
+    res.redirect('/module/' + numero);
+});
+
 app.get('/module/:numero', (req, res) => {
 
     const numero = parseInt(req.params.numero);
 
     if (numero >= 1 && numero <= 6) {
-    status[numero - 1] = !status[numero - 1];
-    }
 
-    res.render('module', { nombre: numero, donner: status[numero - 1] });
-  
-  
+        res.render('module', {
+            nombre: numero,
+            donner: status[numero - 1]
+        });
+
+    } else {
+
+        res.render('module', {
+            nombre: numero,
+            donner: false
+        });
+    }
 });
 app.get('/reset', (req, res) => {
     for (let i = 0; i < status.length; i++) {
