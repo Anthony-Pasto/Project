@@ -1,15 +1,41 @@
 const express = require('express');
 const app = express();
-
 const PORT = 3000;
+const { exec } = require('child_process');
 var status = [false, false, false, false, false, false];
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
 // Page d'accueil
 app.get('/', (req, res) => {
+maFonction();
    res.render('index' )
 });
-
-
+function maFonction() {
+if(status[5]==true)
+        exec('pinctrl set 4 op dh');
+    else 
+        exec('pinctrl set 4 op dl');
+    if(status[4]==true)
+        exec('pinctrl set 22 op dh');
+    else 
+        exec('pinctrl set 22 op dl');
+    if(status[3]==true)
+        exec('pinctrl set 27 op dh');
+    else 
+        exec('pinctrl set 27 op dl');
+    if(status[2]==true)
+        exec('pinctrl set 10 op dh');
+    else 
+        exec('pinctrl set 10 op dl');
+    if(status[1]==true)
+        exec('pinctrl set 9 op dh');
+    else 
+        exec('pinctrl set 9 op dl');
+    if(status[0]==true)
+        exec('pinctrl set 11 op dh');
+    else 
+        exec('pinctrl set 11 op dl');
+}
 // Page contact
 app.get('/contact', (req, res) => {
     res.send(`
@@ -40,22 +66,43 @@ app.get('/contact', (req, res) => {
 
 
 // Route module
-app.get('/module/:numero', (req, res) => {
+app.post('/module/:numero', (req, res) => {
 
     const numero = parseInt(req.params.numero);
 
     if (numero >= 1 && numero <= 6) {
-    status[numero - 1] = !status[numero - 1];
+
+        status[numero - 1] = req.body.etat === "on";
+
     }
 
-    res.render('module', { nombre: numero, donner: status[numero - 1] });
-  
-  
+    res.redirect('/module/' + numero);
+});
+
+app.get('/module/:numero', (req, res) => {
+maFonction();
+    const numero = parseInt(req.params.numero);
+
+    if (numero >= 1 && numero <= 6) {
+
+        res.render('module', {
+            nombre: numero,
+            donner: status[numero - 1]
+        });
+
+    } else {
+
+        res.render('module', {
+            nombre: numero,
+            donner: false
+        });
+    }
 });
 app.get('/reset', (req, res) => {
     for (let i = 0; i < status.length; i++) {
         status[i] = false;
     }
+maFonction();
     res.send(`
         Statut réinitialisé.
         <a href="/">Retour à l'accueil</a>
